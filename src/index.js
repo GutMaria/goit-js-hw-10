@@ -1,58 +1,26 @@
-// import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
+import ApiService from './cat-api.js';
+import LoadingStatus from './loading.js';
 
 const selectCat = document.querySelector('.breed-select');
 const catCard = document.querySelector('.cat-info');
-// const loader = document.querySelector('.loader');
+const loader = document.querySelector('.loader');
+const error = document.querySelector('.error');
+// створюємо екземпляри класу, назва екземпляру з маленької букви
+const apiService = new ApiService();
+const loadingStatus = new LoadingStatus(loader, error);
 
 // При завантажені сторінки, запит на сервер за колекцією порід, і створення списку в Select
-// fetchBreeds().then(data => createOptions(data));
 
-// selectCat.addEventListener('change', selectBreed);
+apiService
+  .fetchBreeds()
+  .then(data => {
+    createOptions(data);
+    loadingStatus.download();
+  })
+  .catch(() => loadingStatus.failure());
 
-// function createOptions(arr) {
-//   // loader.hidden = true;
-//   selectCat.hidden = false;
-//   const options = arr.map(({ id, name }) => {
-//     return `<option value=${id}>${name}</option>`;
-//   });
-
-//   selectCat.innerHTML = options.join('');
-// }
-
-// function selectBreed(evt) {
-//   catCard.innerHTML = '';
-//   // loader.hidden = false;
-//   let breedId = evt.currentTarget.value;
-//   fetchCatByBreed(breedId).then(data => renderCatCard(data[0]));
-// }
-
-// function renderCatCard({ url, breeds }) {
-//   const temperament = breeds[0].temperament;
-//   const name = breeds[0].name;
-//   const description = breeds[0].description;
-
-//   const catInfo = `<img src="${url}" alt="${name}" width=400/>
-//   <div>
-//   <h2>${name}</h2>
-//   <P>${description}</P>
-//   <p>Temperament: ${temperament}</p>
-//   </div>`;
-
-//   catCard.innerHTML = catInfo;
-// }
-
-// ------------------------Пробую створити класс для роботи з АРІ---------------------------
-
-import ApiService from './cat-api.js';
-// створюємо екземпляр класу
-const ApiService = new ApiService();
-console.log(ApiService);
-ApiService.fetchBreeds();
-// -----------Застрягла------------
-
-// ApiService.fetchBreeds().then(data => createOptions(data));
-
-// selectCat.addEventListener('change', selectBreed);
+// Прослуховувач на селектCat
+selectCat.addEventListener('change', selectBreed);
 
 function createOptions(arr) {
   // loader.hidden = true;
@@ -65,10 +33,20 @@ function createOptions(arr) {
 }
 
 function selectBreed(evt) {
+  // показуэмо завантаження
+  loadingStatus.loading();
+  // очищаємо розмітку
   catCard.innerHTML = '';
-  // loader.hidden = false;
+
   let breedId = evt.currentTarget.value;
-  fetchCatByBreed(breedId).then(data => renderCatCard(data[0]));
+  // робимо запит за котиком
+  apiService
+    .fetchCatByBreed(breedId)
+    .then(data => {
+      renderCatCard(data);
+      loadingStatus.download();
+    })
+    .catch(() => loadingStatus.failure());
 }
 
 function renderCatCard({ url, breeds }) {
@@ -76,8 +54,8 @@ function renderCatCard({ url, breeds }) {
   const name = breeds[0].name;
   const description = breeds[0].description;
 
-  const catInfo = `<img src="${url}" alt="${name}" width=400/>
-  <div>
+  const catInfo = `<img src="${url}" alt="${name}" class='image'/>
+  <div class='info'>
   <h2>${name}</h2>
   <P>${description}</P>
   <p>Temperament: ${temperament}</p>

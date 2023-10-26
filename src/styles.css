@@ -1,0 +1,30 @@
+.breed-select {
+    font-size: 15px;
+margin-bottom: 20px;
+}
+
+.loader {
+color: blue;
+margin-top: 0;
+}
+
+.error {
+    color: red;
+}
+
+.cat-info{
+    display: flex;
+}
+
+.image{
+    width: 400px;
+}
+
+.info{
+margin-left: 20px;
+    width: 400px;
+}
+
+.info > h2 {
+    margin-top: 0;
+}
